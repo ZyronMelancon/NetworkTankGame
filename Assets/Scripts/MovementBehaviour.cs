@@ -13,11 +13,15 @@ public class MovementBehaviour : NetworkBehaviour {
 
     List<WheelCollider> wheels;
 
+    Vector2 inputVec;
+
 	// Use this for initialization
 	void Start ()
     {
+        inputVec = new Vector2();
+
         self = GetComponent<Rigidbody>();
-        if (isLocalPlayer)
+        if (localPlayerAuthority)
             StartCoroutine(NetMove());
 
         wheels = new List<WheelCollider>();
@@ -34,7 +38,8 @@ public class MovementBehaviour : NetworkBehaviour {
         if (!isLocalPlayer)
             return;
 
-        Vector2 inputVec = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        inputVec = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+
         Move(inputVec);
 	}
 
@@ -72,7 +77,7 @@ public class MovementBehaviour : NetworkBehaviour {
         while(true)
         {
             yield return new WaitForSeconds(Mathf.Min(0.05f, 1/updatesPerSecond));
-            CmdMove(self.velocity, self.position, self.rotation.eulerAngles, new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")));
+            CmdMove(self.velocity, self.position, self.rotation.eulerAngles, inputVec);
         }
     }
 }
